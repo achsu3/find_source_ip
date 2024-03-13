@@ -6,6 +6,13 @@ import (
 	"net"
 	"net/http"
 	"time"
+	"flag"
+	"fmt"
+	"strings"
+)
+
+var (
+	flagIP = flag.String("ip", "6", "run over IPv4 or IPv6: 4 or 6, default=6")
 )
 
 func noRedirect(req *http.Request, via []*http.Request) error {
@@ -81,5 +88,55 @@ func perform_request(src_ip string) bool {
 
 func main() {
 	//perform_request("38.110.46.22")
-	perform_request("2001:550:9005::11")
+	// perform_request("2001:550:9005::11")
+	// loop through each IP on each interface
+	flag.Parse()
+	log.Println("IP Version: ", *flagIP)
+
+    interfaces, err := net.Interfaces()
+    if err != nil {
+        fmt.Println("Error:", err)
+    }
+
+	local_addr_ip := ""
+    for _, iface := range interfaces {
+        // Get addresses associated with the interface
+        addrs, err := iface.Addrs()
+        if err != nil {
+            log.Println("Error:", err)
+            continue
+        }
+
+        // Print the interface name
+        fmt.Printf("Interface: %s\n", iface.Name)
+	
+		// fmt.Printf("Found Interface: %s\n", iface.Name)
+		// Print each address associated with the interface
+		for _, a := range addrs {
+			if ipnet, ok := a.(*net.IPNet); ok {
+				
+				if *flagIP == "4" && strings.Contains(ipnet.IP.String(), ".") {
+					local_addr_ip = ipnet.IP.String()
+
+					if perform_request(local_addr_ip){
+						fmt.Println(local_addr_ip)
+						return
+					}
+
+				
+				}
+				if *flagIP == "6"  && strings.Contains(ipnet.IP.String(), ":") {
+					local_addr_ip = ipnet.IP.String()
+					if perform_request(local_addr_ip){
+						fmt.Println(local_addr_ip)
+						return
+					}
+				}
+			}
+		}
+	
+    }
+
+	fmt.Println("0")
+	return 
 }
