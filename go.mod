@@ -1,4 +1,4 @@
-module test_internet
+module github.com/achsu3/find_source_ip/test_internet
 
 go 1.22.1
 
