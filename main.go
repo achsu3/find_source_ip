@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
+	// log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"time"
@@ -36,7 +36,7 @@ func perform_request(src_ip string) bool {
 	conn, err := dialer.Dial("tcp", net.JoinHostPort("example.com", "80"))
 
 	if err != nil {
-		log.Error(err)
+		// log.Error(err)
 		return false
 	}
 
@@ -62,7 +62,7 @@ func perform_request(src_ip string) bool {
 	// Create an HTTP GET request with custom headers
 	req, err := http.NewRequest("GET", httpUrl, nil)
 	if err != nil {
-		log.Error("Error creating request:", err)
+		// log.Error("Error creating request:", err)
 		return false
 	}
 
@@ -79,10 +79,13 @@ func perform_request(src_ip string) bool {
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
-		log.Error("Error ", err)
+		// log.Error("Error ", err)
 		return false
 	}
-	log.Error(resp)
+	// log.Error(resp)
+	if resp != nil{
+		resp = nil
+	}
 	return true
 }
 
@@ -91,11 +94,12 @@ func main() {
 	// perform_request("2001:550:9005::11")
 	// loop through each IP on each interface
 	flag.Parse()
-	log.Println("IP Version: ", *flagIP)
+	// log.Println("IP Version: ", *flagIP)
 
     interfaces, err := net.Interfaces()
     if err != nil {
-        fmt.Println("Error:", err)
+        // fmt.Println("Error:", err)
+		err = nil
     }
 
 	local_addr_ip := ""
@@ -103,12 +107,12 @@ func main() {
         // Get addresses associated with the interface
         addrs, err := iface.Addrs()
         if err != nil {
-            log.Println("Error:", err)
-            continue
+            // log.Println("Error:", err)
+            err = nil
         }
 
         // Print the interface name
-        fmt.Printf("Interface: %s\n", iface.Name)
+        // fmt.Printf("Interface: %s\n", iface.Name)
 	
 		// fmt.Printf("Found Interface: %s\n", iface.Name)
 		// Print each address associated with the interface
@@ -137,6 +141,6 @@ func main() {
 	
     }
 
-	fmt.Println("0")
+	fmt.Println("::")
 	return 
 }
